@@ -1,0 +1,31 @@
+{
+  "id": "discord-tts-attacher",
+  "name": "Discord TTS Attacher",
+  "description": "Synthesize Discord assistant replies to MP3 (Edge TTS) and attach them in a follow-up message.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": { "type": "boolean" },
+      "voice": { "type": "string" },
+      "outputDir": {
+        "type": "string",
+        "description": "Directory for MP3 and markers. Resolved with api.resolvePath if relative. Default: $OPENCLAW_STATE_DIR/workspace/TTS or ~/.openclaw/workspace/TTS. Override env: DISCORD_TTS_OUTPUT_DIR."
+      },
+      "channelAllowlist": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "maxTextLength": { "type": "integer", "minimum": 1 },
+      "sendDedupeMs": { "type": "integer", "minimum": 0, "description": "Skip a second TTS run when the same text+target flushes again within this many ms (0 = off)." },
+      "debounceMs": { "type": "integer", "minimum": 1, "description": "Wait this long after the last text chunk before synthesizing (burst aggregation)." },
+      "pickupIntervalMs": { "type": "integer", "minimum": 1, "description": "How often the gateway polls for worker completion." },
+      "pickupTimeoutMs": { "type": "integer", "minimum": 1, "description": "Minimum time to wait for the MP3; actual wait is at least this and scales with estimated synthesis time." },
+      "synthTimeoutBaseMs": { "type": "integer", "minimum": 1, "description": "Base ms added to per-character estimate for Edge TTS timeout." },
+      "synthTimeoutPerCharMs": { "type": "number", "minimum": 0, "description": "Ms per character added to synthesis timeout estimate." },
+      "synthTimeoutJitterMs": { "type": "integer", "minimum": 0, "description": "Extra ms buffer added to synthesis timeout estimate." },
+      "synthTimeoutMaxMs": { "type": "integer", "minimum": 1, "description": "Cap for synthesis timeout passed to node-edge-tts and Promise.race." }
+    }
+  }
+}

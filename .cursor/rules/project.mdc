@@ -1,0 +1,11 @@
+---
+description: Discord TTS Attacher OpenClaw plugin — layout and workflow
+globs: "**/*.{js,mjs,json,md}"
+alwaysApply: true
+---
+
+# Project layout
+
+- **Repository root**: Plugin sources — `index.js`, `worker.mjs`, `worker-log.mjs`, `openclaw-resolve.mjs`, `package.json`, `openclaw.plugin.json`, `README.md`. **`node-edge-tts`** is a **dependency**; **`openclaw`** is an **optional** peer. Keep **`package.json`** and **`openclaw.plugin.json`** `version` fields identical; run **`npm run check-version`** or **`npm run release`** to verify.
+- **User docs**: Root **`README.md`** is the install and configuration guide; **`npm run release`** copies it into the local bundle output (gitignored, used for zip / ClawHub) and mirrors the same file one level above that bundle inside that output tree.
+- **Live OpenClaw plugin**: Typically **`~/.openclaw/extensions/discord-tts-attacher/`** with **`npm install openclaw node-edge-tts`** there. Maintainer workflows (**`npm run release`**, **`npm run sync-live`**, ClawHub) are described in the development guide in the source tree.
