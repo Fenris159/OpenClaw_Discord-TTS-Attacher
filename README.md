@@ -4,6 +4,8 @@ An **OpenClaw** plugin that turns your assistant’s **Discord text replies** in
 
 This is **not** Discord’s built-in “text-to-speech” in the client, and it is separate from OpenClaw’s other audio delivery paths. Listeners get a regular message with an MP3 they can play in Discord or download.
 
+Synthesis runs in a **separate Node child process** (`worker.mjs`) so Edge TTS work stays off the gateway’s main event loop.[^child-process]
+
 ## What you need
 
 - OpenClaw running with the **Discord** channel set up
@@ -119,6 +121,8 @@ The plugin writes short-lived synthesis files and logs under **`outputDir`** (MP
 ## Maintainers
 
 If you have the **complete source repository** (not only a minimal plugin package), open the **development guide** next to the plugin sources for release builds, ClawHub publishing, live sync, where **`openclaw.plugin.json`** defines the config schema, and the exact timeout math used in code. Use **`npm run release`**, **`npm run sync-live`**, and **`npm run check-version`** from the repository root.
+
+[^child-process]: The plugin uses Node’s **`child_process.spawn`** with **`process.execPath`** and a **fixed path** to the bundled **`worker.mjs`**, passing only a **JSON job payload** (text, voice, paths, timeouts). **No shell** is invoked (no `shell: true`, no arbitrary commands). Registries or scanners that flag `child_process` (for example ClawHub) are seeing this intentional worker offload, not generic shell execution.
 
 ## License
 
