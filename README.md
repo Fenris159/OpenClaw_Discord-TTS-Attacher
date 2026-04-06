@@ -126,4 +126,4 @@ If you have the **complete source repository** (not only a minimal plugin packag
 
 ## License
 
-No license file is included by default; add one if you redistribute this project.
+MIT License
