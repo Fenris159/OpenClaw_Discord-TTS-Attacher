@@ -2,7 +2,7 @@
   "id": "discord-tts-attacher",
   "name": "Discord TTS Attacher",
   "description": "Synthesize Discord assistant replies to MP3 (Edge TTS) and attach them in a follow-up message.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,

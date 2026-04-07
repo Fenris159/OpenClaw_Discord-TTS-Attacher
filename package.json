@@ -1,13 +1,12 @@
 {
   "name": "discord-tts-attacher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenClaw plugin: synthesize Discord assistant replies to MP3 (Edge TTS) and attach them in a follow-up message.",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "check-version": "node scripts/check-version.mjs",
     "release": "bash scripts/prepare-release.sh",
-    "sync-live": "bash scripts/sync-to-live-plugin.sh",
     "test:openclaw-resolve": "node scripts/test-openclaw-resolve.mjs"
   },
   "dependencies": {

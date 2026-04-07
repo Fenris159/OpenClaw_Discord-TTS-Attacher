@@ -1,0 +1,2 @@
+# Owner-only helper; not part of shared/public dev workflow (see .cursor/rules/project.mdc)
+scripts/sync-to-live-plugin.sh

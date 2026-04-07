@@ -1,12 +1,12 @@
 # Discord TTS Attacher — development
 
-This document is for **maintainers**: releases, syncing to a local OpenClaw extension, and ClawHub. **End users** should read **[README.md](README.md)** instead.
+This document is for **maintainers**: releases, ClawHub, and how the plugin fits the **`~/.openclaw/extensions/`** layout. **End users** should read **[README.md](README.md)** instead.
 
 ## Repository layout
 
 | Location | Purpose |
 |----------|---------|
-| **Plugin sources** (repository root) | Source of truth: `index.js`, `worker.mjs`, `worker-log.mjs`, `openclaw-resolve.mjs`, `package.json`, `openclaw.plugin.json`, user-facing **[README.md](README.md)**. |
+| **Plugin sources** (repository root) | Source of truth: `index.js`, `worker.mjs`, `worker-log.mjs`, `openclaw-resolve.mjs`, `package.json`, `openclaw.plugin.json`, user-facing **[README.md](README.md)**, **[CHANGELOG.md](CHANGELOG.md)** (release notes; copied into the minimal bundle). |
 | **`~/.openclaw/extensions/discord-tts-attacher/`** | Typical runtime location. Run **`rm -rf node_modules && npm install`** there (pulls **`node-edge-tts`**; **`openclaw`** is optional). |
 
 ## Release version (semver)
@@ -30,7 +30,7 @@ npm run check-version
 npm run test:openclaw-resolve -- /path/to/any/file/under/openclaw
 ```
 
-Add **`--strict`** if `require(dist/plugin-sdk/...)` must succeed (needs **`npm install`** inside that OpenClaw package, not just an unpacked tarball).
+Add **`--strict`** if **`loadOpenClawPluginSdk()`** must succeed end-to-end (needs **`npm install`** inside that OpenClaw package so `require()` can load plugin entry + Discord module and their deps, not just an unpacked tarball).
 
 Separate from semver: **`package.json` → `openclaw.build.openclawVersion`** / **`pluginSdkVersion`** record which **OpenClaw** release you built or tested against (calendar-style versions). Bump those when you verify against a newer gateway; they are **not** the plugin’s `1.2.3` release number.
 
@@ -58,10 +58,10 @@ Here **`synthTimeoutMs`** is the synthesis estimate above. So **`pickupTimeoutMs
 ## Workflow
 
 1. Edit sources at the repository root.  
-   Optional: **`npm install`** in the root for **`node-edge-tts`** and maintainer scripts; SDK resolution uses **`openclaw-resolve.mjs`** (optional **`npm install openclaw`** if you need fallback **`require('openclaw/...')`** outside a gateway). The **gateway** still uses **`node_modules`** inside **`~/.openclaw/extensions/discord-tts-attacher/`**.
+   Optional: **`npm install`** in the root for **`node-edge-tts`** and maintainer scripts. **`openclaw-resolve.mjs`** loads **`definePluginEntry`** from **`dist/plugin-sdk/plugin-entry.js`** and picks **`sendMessageDiscord`** from **`dist/extensions/discord/runtime-api.js`** (OpenClaw **2026.4+**) or **`dist/plugin-sdk/discord.js`** (legacy). Optional **`npm install openclaw`** if you need the **`openclaw/package.json`** fallback outside a gateway. The **gateway** still uses **`node_modules`** inside **`~/.openclaw/extensions/discord-tts-attacher/`**.
 
 2. **`npm run release`**  
-   Refreshes the minimal plugin bundle (plugin sources only, no `node_modules`). Copies the root **`README.md`** into that bundle **and** mirrors the same file one level up so the local output tree shows the same user-facing doc as the repository root. The command prints the bundle output directory when it finishes. That output tree is **not committed to git** and is **omitted from ClawHub “publish whole repo” uploads**; generate it whenever you need a zip or a **`clawhub package publish .`** target.
+   Refreshes the minimal plugin bundle (plugin sources only, no `node_modules`, no `scripts/`). Copies the root **`README.md`** into that bundle **and** mirrors it one level up as **`release/README.md`**. **`CHANGELOG.md`** is included in the bundle via rsync. The command prints the bundle output directory when it finishes. That output tree is **not committed to git** and is **omitted from ClawHub “publish whole repo” uploads**; generate it whenever you need a zip or a **`clawhub package publish .`** target.
 
 3. **ClawHub (`clawhub package publish`)**  
    Code plugins need **`openclaw.compat.pluginApi`** and **`openclaw.build.openclawVersion`** in **`package.json`** (ClawHub rejects uploads without them). Bump **`openclaw.build.openclawVersion`** / **`pluginSdkVersion`** when you verify against a newer OpenClaw release.
@@ -75,10 +75,6 @@ Here **`synthTimeoutMs`** is the synthesis estimate above. So **`pickupTimeoutMs
    ```
 
    To publish from the **repository root** via GitHub, the same **`package.json`** metadata applies; committed ignore rules omit dev-only paths from that upload. Required fields for external code plugins: [ClawHub `openclawContract.ts`](https://github.com/openclaw/clawhub/blob/main/packages/schema/src/openclawContract.ts).
-
-4. **`npm run sync-live`**  
-   Copies plugin sources into **`~/.openclaw/extensions/discord-tts-attacher/`**, skipping ancillary dev-only files (lockfile stays in the dev tree; the extension folder gets its own from `npm install` there).  
-   Restart the OpenClaw gateway after syncing.
 
 ## Documentation for releases
 

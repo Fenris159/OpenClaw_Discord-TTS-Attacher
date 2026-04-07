@@ -1,6 +1,9 @@
 /**
- * Resolve the OpenClaw npm package root for loading dist/plugin-sdk/* without
- * requiring openclaw in this extension's node_modules.
+ * Resolve the OpenClaw npm package root for loading definePluginEntry + Discord send
+ * without requiring openclaw in this extension's node_modules.
+ *
+ * Discord: OpenClaw 2026.4+ exposes sendMessageDiscord from dist/extensions/discord/runtime-api.js;
+ * older trees use dist/plugin-sdk/discord.js. See resolveDiscordSendPath().
  */
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';

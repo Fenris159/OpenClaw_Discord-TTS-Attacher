@@ -41,12 +41,25 @@ if (!root) {
 }
 
 const pe = path.join(root, 'dist', 'plugin-sdk', 'plugin-entry.js');
-const disc = path.join(root, 'dist', 'plugin-sdk', 'discord.js');
-if (!existsSync(pe) || !existsSync(disc)) {
-  console.error('FAILED: missing dist/plugin-sdk files under', root);
+const modernDiscord = path.join(root, 'dist', 'extensions', 'discord', 'runtime-api.js');
+const legacyDiscord = path.join(root, 'dist', 'plugin-sdk', 'discord.js');
+if (!existsSync(pe)) {
+  console.error('FAILED: missing dist/plugin-sdk/plugin-entry.js under', root);
+  process.exit(1);
+}
+if (!existsSync(modernDiscord) && !existsSync(legacyDiscord)) {
+  console.error(
+    'FAILED: no Discord send module (expected dist/extensions/discord/runtime-api.js or dist/plugin-sdk/discord.js) under',
+    root,
+  );
   process.exit(1);
 }
 console.log('layout OK:', pe);
+console.log(
+  'discord send:',
+  existsSync(modernDiscord) ? modernDiscord : legacyDiscord,
+  existsSync(modernDiscord) ? '(OpenClaw 2026.4+)' : '(legacy)',
+);
 
 try {
   const sdk = loadOpenClawPluginSdk();

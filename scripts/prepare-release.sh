@@ -12,6 +12,7 @@ rsync -a --delete \
   --exclude release \
   --exclude .git \
   --exclude .cursor \
+  --exclude .cursorignore \
   --exclude node_modules \
   --exclude '*.code-workspace' \
   --exclude '.DS_Store' \
@@ -38,4 +39,10 @@ cp -f "$ROOT/worker.mjs" "$OUT/worker.mjs"
 cp -f "$ROOT/worker-log.mjs" "$OUT/worker-log.mjs"
 cp -f "$ROOT/openclaw-resolve.mjs" "$OUT/openclaw-resolve.mjs"
 rm -f "$OUT/package-lock.json"
+# Rsync excludes do not always remove stale files from a previous layout; keep only the public plugin tree.
+find "$OUT" -mindepth 1 -maxdepth 1 ! \( \
+  -name CHANGELOG.md -o -name LICENSE -o -name README.md -o \
+  -name index.js -o -name openclaw-resolve.mjs -o -name openclaw.plugin.json -o \
+  -name package.json -o -name worker-log.mjs -o -name worker.mjs \
+\) -exec rm -rf {} +
 echo "Release bundle ready: $OUT"

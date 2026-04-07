@@ -30,7 +30,7 @@ OpenClaw places the plugin under your extensions layout; you do not copy folders
 
 `~/.openclaw/extensions/discord-tts-attacher/`
 
-The zip or repo folder you get is **only** plugin source files and **`package.json`**—it does **not** include a vendored copy of **`node-edge-tts`** inside the archive. Instead, **`package.json` declares `node-edge-tts` under `dependencies`**, so when you run **`npm install`**, npm **downloads and installs** it from the registry into **`node_modules`** (you need network access to npm for that step). **`openclaw`** is an **optional** peer dependency so you usually **do not** install it in the extension folder; the SDK is loaded from the running gateway or **`OPENCLAW_PACKAGE_ROOT`**.
+A **release** zip or ClawHub package includes plugin sources, **`package.json`**, **`openclaw.plugin.json`**, **`LICENSE`**, **`CHANGELOG.md`**, and **`README.md`**—it does **not** include a vendored copy of **`node-edge-tts`** inside the archive. Instead, **`package.json` declares `node-edge-tts` under `dependencies`**, so when you run **`npm install`**, npm **downloads and installs** it from the registry into **`node_modules`** (you need network access to npm for that step). **`openclaw`** is an **optional** peer dependency so you usually **do not** install it in the extension folder; the SDK is loaded from the running gateway or **`OPENCLAW_PACKAGE_ROOT`**.
 
 ```bash
 cd ~/.openclaw/extensions/discord-tts-attacher
@@ -38,7 +38,7 @@ rm -rf node_modules
 npm install
 ```
 
-The plugin loads OpenClaw’s **`dist/plugin-sdk`** from the running gateway (walking upward from the host process’s **`argv[1]`**), from **`OPENCLAW_PACKAGE_ROOT`**, or—if you install it—via **`require('openclaw/...')`**. You do **not** need **`npm install openclaw`** in the extension folder unless you want that fallback.
+The plugin finds the **`openclaw`** package root from the running gateway (walking upward from the host process’s **`argv[1]`**), from **`OPENCLAW_PACKAGE_ROOT`**, or—if you install **`openclaw`** here—via **`openclaw/package.json`**. It loads **`definePluginEntry`** from **`dist/plugin-sdk/plugin-entry.js`**, and **`sendMessageDiscord`** from **`dist/extensions/discord/runtime-api.js`** on OpenClaw **2026.4+**, or from **`dist/plugin-sdk/discord.js`** on older installs. You do **not** need **`npm install openclaw`** in the extension folder unless you want that fallback.
 
 If you used ClawHub and dependencies look wrong, run the same **`rm -rf node_modules && npm install`** in that plugin directory.
 
@@ -107,7 +107,7 @@ How long synthesis may run and how long the gateway waits for the finished MP3 b
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `DISCORD_TTS_OUTPUT_DIR` | Overrides the default output directory when `outputDir` is not set in config.                                                                                                                                                                                                                                                              |
 | `OPENCLAW_STATE_DIR`     | Used when building the default TTS directory.                                                                                                                                                                                                                                                                                              |
-| `OPENCLAW_PACKAGE_ROOT`  | Absolute path to the **`openclaw` npm package root** (directory whose **`package.json`** has **`"name": "openclaw"`** and which contains **`dist/plugin-sdk/plugin-entry.js`**). Use this if the gateway does not load the SDK via **`argv[1]`** walk and you have not installed the optional **`openclaw`** package inside the extension. |
+| `OPENCLAW_PACKAGE_ROOT`  | Absolute path to the **`openclaw` npm package root** (directory whose **`package.json`** has **`"name": "openclaw"`** and which contains **`dist/plugin-sdk/plugin-entry.js`**, with Discord send in **`dist/extensions/discord/runtime-api.js`** or legacy **`dist/plugin-sdk/discord.js`**). Use this if the gateway does not resolve the package via **`argv[1]`** walk and you have not installed the optional **`openclaw`** package inside the extension. |
 
 
 ## Choosing a voice
@@ -120,7 +120,7 @@ The plugin writes short-lived synthesis files and logs under **`outputDir`** (MP
 
 ## Maintainers
 
-If you have the **complete source repository** (not only a minimal plugin package), open the **development guide** next to the plugin sources for release builds, ClawHub publishing, live sync, where **`openclaw.plugin.json`** defines the config schema, and the exact timeout math used in code. Use **`npm run release`**, **`npm run sync-live`**, and **`npm run check-version`** from the repository root.
+If you have the **complete source repository** (not only a minimal plugin package), open the **development guide** next to the plugin sources for release builds, ClawHub publishing, where **`openclaw.plugin.json`** defines the config schema, and the exact timeout math used in code. Use **`npm run release`** and **`npm run check-version`** from the repository root.
 
 [^child-process]: The plugin uses Node’s **`child_process.spawn`** with **`process.execPath`** and a **fixed path** to the bundled **`worker.mjs`**, passing only a **JSON job payload** (text, voice, paths, timeouts). **No shell** is invoked (no `shell: true`, no arbitrary commands). Registries or scanners that flag `child_process` (for example ClawHub) are seeing this intentional worker offload, not generic shell execution.
 
