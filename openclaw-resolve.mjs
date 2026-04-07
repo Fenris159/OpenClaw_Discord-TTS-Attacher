@@ -57,11 +57,24 @@ export function resolveOpenClawPackageRoot() {
 /**
  * Load definePluginEntry + sendMessageDiscord from resolved OpenClaw dist or fallback require.
  */
+function resolveDiscordSendPath(openClawRoot) {
+  const modern = path.join(openClawRoot, 'dist', 'extensions', 'discord', 'runtime-api.js');
+  if (existsSync(modern)) return modern;
+  const legacy = path.join(openClawRoot, 'dist', 'plugin-sdk', 'discord.js');
+  if (existsSync(legacy)) return legacy;
+  return null;
+}
+
 export function loadOpenClawPluginSdk() {
   const root = resolveOpenClawPackageRoot();
   if (root) {
     const pluginEntryPath = path.join(root, 'dist', 'plugin-sdk', 'plugin-entry.js');
-    const discordPath = path.join(root, 'dist', 'plugin-sdk', 'discord.js');
+    const discordPath = resolveDiscordSendPath(root);
+    if (!discordPath) {
+      throw new Error(
+        `discord-tts-attacher: OpenClaw at ${root} has no Discord send API (expected dist/extensions/discord/runtime-api.js or dist/plugin-sdk/discord.js). Upgrade OpenClaw or discord-tts-attacher.`
+      );
+    }
     return {
       definePluginEntry: require(pluginEntryPath).definePluginEntry,
       sendMessageDiscord: require(discordPath).sendMessageDiscord,
@@ -70,10 +83,17 @@ export function loadOpenClawPluginSdk() {
   }
 
   try {
+    const pkgJsonPath = require.resolve('openclaw/package.json');
+    const npmRoot = path.dirname(pkgJsonPath);
+    const pluginEntryPath = path.join(npmRoot, 'dist', 'plugin-sdk', 'plugin-entry.js');
+    const discordPath = resolveDiscordSendPath(npmRoot);
+    if (!discordPath || !existsSync(pluginEntryPath)) {
+      throw new Error(`missing plugin-entry or discord send module under ${npmRoot}`);
+    }
     return {
-      definePluginEntry: require('openclaw/plugin-sdk/plugin-entry').definePluginEntry,
-      sendMessageDiscord: require('openclaw/plugin-sdk/discord').sendMessageDiscord,
-      openClawPackageRoot: null
+      definePluginEntry: require(pluginEntryPath).definePluginEntry,
+      sendMessageDiscord: require(discordPath).sendMessageDiscord,
+      openClawPackageRoot: npmRoot
     };
   } catch (err) {
     throw new Error(
