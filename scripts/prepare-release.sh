@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Build release/discord-tts-attacher/ — minimal plugin tree for zip, manual share, or
-#   clawhub package publish ./release/discord-tts-attacher
+# Build release/discord-tts-attacher/ — minimal plugin tree for ClawHub, manual share, etc.
+# Also writes release/discord-tts-attacher-<version>.zip (folder inside the archive).
 # (see DEVELOPMENT.md). No node_modules or dev-only files.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -44,4 +44,10 @@ find "$OUT" -mindepth 1 -maxdepth 1 ! \( \
   -name index.js -o -name openclaw-resolve.mjs -o -name openclaw.plugin.json -o \
   -name package.json -o -name worker-log.mjs -o -name worker.mjs \
 \) -exec rm -rf {} +
+VERSION="$(cd "$ROOT" && node -p "require('./package.json').version")"
+ZIP_NAME="discord-tts-attacher-${VERSION}.zip"
+ZIP_PATH="$ROOT/release/$ZIP_NAME"
+rm -f "$ZIP_PATH"
+( cd "$ROOT/release" && zip -rq "$ZIP_NAME" discord-tts-attacher )
 echo "Release bundle ready: $OUT"
+echo "Release zip: $ZIP_PATH"
