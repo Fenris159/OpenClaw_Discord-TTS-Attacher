@@ -33,7 +33,6 @@ delete pkg.scripts;
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 "
 cp -f "$ROOT/README.md" "$OUT/README.md"
-cp -f "$ROOT/README.md" "$ROOT/release/README.md"
 cp -f "$ROOT/index.js" "$OUT/index.js"
 cp -f "$ROOT/worker.mjs" "$OUT/worker.mjs"
 cp -f "$ROOT/worker-log.mjs" "$OUT/worker-log.mjs"
